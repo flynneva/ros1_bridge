@@ -151,6 +151,16 @@ if isinstance(ros2_fields[-1].type, NamespacedType):
 @[        if isinstance(ros2_fields[-1].type, BoundedSequence)]@
   // bounded size sequence, check that the ros 1 vector size is not larger than the upper bound for the target
   assert(ros1_msg.@(ros1_field_selection).size() <= @(ros2_fields[-1].type.maximum_size));
+  RCLCPP_DEBUG(
+    rclcpp::get_logger("debugging"),
+    "Resizing ROS 2 field `%s` to %zu [<= %zu ]",
+@[  if isinstance(ros2_fields[-1].type, NamespacedType)]@
+    @('::'.join(ros2_fields[-1].type.namespaces) + '::' + ros2_fields[-1].type.name + '::' + ros2_field_selection),
+@[  else ]@
+    "@(ros2_field_selection)",
+@[  end if ]@
+    ros1_msg.@(ros1_field_selection).size(),
+    @(ros2_fields[-1].type.maximum_size));
 @[        end if]@
   // resize ros2 field to match the ros1 field
   ros2_msg.@(ros2_field_selection).resize(ros1_msg.@(ros1_field_selection).size());
